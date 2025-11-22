@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Reconnect with Your AI Ally — Login</title>
+
+  <style>
+   body {
+    margin: 0;
+    height: 100vh;
+    font-family: "Inter", sans-serif;
+    background: radial-gradient(circle at top center, #0b1626 0%, #01030a 100%);
+    color: #e2e8f0;
+}
+
+.page {
+    min-height: 100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}
+
+.logo {
+    width: 90px;
+    height: 90px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    box-shadow:
+        0 0 30px #36e0ff55,
+        0 0 60px #6a41fe33;
+}
+
+h1 {
+    font-size: 30px;
+    margin-bottom: 10px;
+    font-weight: 900;
+    background: linear-gradient(90deg,#2ee9ef,#4b6bfe,#6a41fe);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.sub {
+    margin-bottom: 30px;
+    font-size: 14px;
+    color:#cbd5e1;
+}
+
+form {
+    width: 420px;
+    display:flex;
+    flex-direction:column;
+}
+
+label {
+    font-size: 14px;
+    font-weight:600;
+    margin-top:14px;
+}
+
+.input {
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    background: rgba(15,25,40,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #e3edff;
+    transition:.25s;
+}
+
+.input:focus {
+    border-color: #4b6bfe;
+    box-shadow:
+        0 0 16px rgba(75,107,254,0.6),
+        0 0 35px rgba(75,107,254,0.3);
+}
+
+.cta {
+    margin-top: 26px;
+    padding: 14px;
+    border-radius: 14px;
+    font-size: 17px;
+    font-weight:800;
+    background: linear-gradient(135deg,#3c8bff,#1c63ff);
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+.bottom {
+    margin-top: 24px;
+    font-size: 14px;
+    color: #a0aec0;
+}
+.bottom a {
+
+    color: #4aa8ff;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.25s ease;
+}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <img src="{{ url_for('static', filename='logo.png') }}" class="logo">
+
+    <h1>Reconnect with Your AI Ally</h1>
+    <div class="sub">Sign in to continue to your smart workspace</div>
+
+    <form class="login" method="POST" action="{{ url_for('login') }}">
+      <label for="username">Username</label>
+      <input id="username" name="username" class="input" placeholder="your username" required>
+
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" class="input" placeholder="your password" required>
+
+      <button type="submit" class="cta">Log in</button>
+    </form>
+
+    <div class="bottom">
+      New here? <a href="{{ url_for('register') }}">Create account</a>
+    </div>
+  </div>
+</body>
+</html>

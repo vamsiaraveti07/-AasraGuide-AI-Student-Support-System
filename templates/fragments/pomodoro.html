@@ -1,0 +1,530 @@
+<div class="pom-page">
+  <div class="pom-grid">
+
+    <!-- LEFT CARD: POMODORO TIMER -->
+    <div class="pom-card pom-card-left">
+      <div class="pom-card-inner">
+        <h2 class="pom-title">
+          <img src="{{ url_for('static', filename='icons/pomo.svg') }}" class="title-icon" alt="">
+          Pomodoro Timer
+        </h2>
+
+        <!-- Time Config -->
+        <div class="pom-config-row">
+          <label>Work
+            <input type="number" id="work-min" value="25" min="5" max="120">
+          </label>
+          <label>Short Break
+            <input type="number" id="break-min" value="5" min="1" max="30">
+          </label>
+          <label>Long Break
+            <input type="number" id="long-break-min" value="15" min="5" max="60">
+          </label>
+
+          <button id="apply-config" class="btn-small">Apply</button>
+        </div>
+
+        <!-- Circle Timer -->
+        <div class="timer-wrap">
+          <div class="ring-wrapper">
+            <svg class="ring-svg" viewBox="0 0 220 220">
+              <defs>
+                <linearGradient id="aasraGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#7d2cff"/>
+                  <stop offset="100%" stop-color="#00c6ff"/>
+                </linearGradient>
+              </defs>
+
+              <circle class="ring-bg" cx="110" cy="110" r="95"></circle>
+              <circle class="ring-fg" id="progress-ring" cx="110" cy="110" r="95"></circle>
+            </svg>
+
+            <div class="ring-time" id="pomodoro-timer-display">25:00</div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="pom-controls">
+          <button id="pomodoro-start-btn">Start</button>
+          <button id="pomodoro-reset-btn" disabled>Reset</button>
+        </div>
+
+        <div id="pomodoro-status" class="pom-status"></div>
+
+        <!-- Notes -->
+        <div class="pom-notes">
+          <label for="session-notes">Session Note (optional)</label>
+          <textarea id="session-notes"
+                    placeholder="What did you work on? How did it feel?"></textarea>
+          <button id="save-session-note" class="btn-outline">Clear Note</button>
+        </div>
+
+        <!-- Theme + toggles -->
+        <div class="pom-options">
+          <div>
+            <label>Theme
+              <select id="theme-picker">
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+                <option value="mint">Mint</option>
+              </select>
+            </label>
+          </div>
+          <div class="pom-toggles">
+            <label>
+              <input type="checkbox" id="sound-toggle" checked> Sound
+            </label>
+            <label>
+              <input type="checkbox" id="notif-toggle" checked> Notifications
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT CARD: STATS / GRAPHS / HISTORY -->
+    <div class="pom-card pom-card-right">
+      <div class="pom-card-inner">
+        <h2 class="pom-title">
+          <img src="{{ url_for('static', filename='icons/stats.svg') }}" class="title-icon" alt="">
+          Focus Overview
+        </h2>
+
+        <div class="stats-row">
+          <div class="stat-pill">
+            <span class="stat-label">Focus Time</span>
+            <span class="stat-value" id="stats-focus-min">0 min</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-label">Sessions</span>
+            <span class="stat-value" id="stats-sessions">0</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-label">Best Streak</span>
+            <span class="stat-value" id="stats-streak">0</span>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <h4>Daily Focus (min)</h4>
+          <canvas id="dailyChart"></canvas>
+        </div>
+
+        <div class="chart-card">
+          <h4>Weekly Summary</h4>
+          <canvas id="weeklyChart"></canvas>
+        </div>
+
+        <div class="history-card">
+          <h4>Session History</h4>
+          <ul id="pomodoro-session-list"></ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<style>
+
+.pom-page {
+  height: calc(100vh - 20px);
+  padding: 18px 26px;
+  box-sizing: border-box;
+}
+
+.pom-grid {
+  height: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 960px) {
+  .pom-page {
+    height: auto;
+    min-height: calc(100vh - 80px);
+  }
+  .pom-grid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
+
+body.theme-dark {
+  background: radial-gradient(circle at top, #162447 0%, #050814 55%, #02030a 100%);
+  color: #e8f4ff;
+}
+
+
+.pom-card {
+  height: 100%;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(0, 198, 255, 0.24), transparent 55%),
+    radial-gradient(circle at 100% 0%, rgba(125, 44, 255, 0.24), transparent 60%),
+    linear-gradient(145deg, rgba(7, 12, 32, 0.96), rgba(3, 5, 18, 0.98));
+  border: 1px solid rgba(0, 255, 214, 0.25);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.9),
+    0 0 40px rgba(0, 255, 214, 0.12);
+  backdrop-filter: blur(22px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+.pom-card::after {
+  content: "";
+  position: absolute;
+  top: 10%;
+  right: 0;
+  width: 4px;
+  height: 80%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #00c6ff, #7d2cff, #38fbd8);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.pom-card-right::after {
+  left: auto;
+}
+.pom-card-inner {
+  flex: 1;
+  padding: 24px 26px 26px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+
+.pom-title {
+  margin: 0 0 20px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.065em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fafeff;
+  text-shadow:
+    0 0 8px rgba(0, 255, 214, 0.7),
+    0 0 20px rgba(0, 198, 255, 0.5);
+}
+
+.title-icon {
+  width: 32px;
+  height: 32px;
+  filter:
+    drop-shadow(0 0 7px rgba(0, 255, 214, 0.85))
+    drop-shadow(0 0 16px rgba(0, 198, 255, 0.9));
+}
+
+.pom-config-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+}
+
+.pom-config-row label {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  color: #cfe9ff;
+}
+
+.pom-config-row input {
+  margin-top: 4px;
+  padding: 7px 10px;
+  border-radius: 11px;
+  border: 1px solid rgba(214, 232, 255, 0.45);
+  background: radial-gradient(circle at 0 0, rgba(0, 198, 255, 0.22), rgba(5, 10, 28, 0.95));
+  color: #ffffff;
+  width: 80px;
+  font-size: 14px;
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.75);
+}
+
+.pom-config-row input:focus {
+  outline: none;
+  border-color: #38fbd6;
+  box-shadow:
+    0 0 0 1px rgba(56, 251, 214, 0.45),
+    0 0 14px rgba(56, 251, 214, 0.55);
+}
+
+
+.btn-small {
+  padding: 8px 16px !important;
+  font-size: 12px !important;
+}
+
+
+.timer-wrap {
+  margin-top: 26px;
+  display: flex;
+  justify-content: center;
+}
+
+.ring-wrapper {
+  position: relative;
+  width: 240px;
+  height: 240px;
+}
+
+.ring-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 13;
+}
+
+.ring-fg {
+  fill: none;
+  stroke: url(#aasraGradient);
+  stroke-width: 13;
+  stroke-linecap: round;
+  stroke-dasharray: 597;   /* 2πr for r=95 */
+  stroke-dashoffset: 597;
+  transition: stroke-dashoffset 0.28s linear;
+  filter:
+    drop-shadow(0 0 14px rgba(0, 255, 214, 0.8))
+    drop-shadow(0 0 30px rgba(0, 198, 255, 0.8));
+  animation: ringGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes ringGlow {
+  from {
+    filter:
+      drop-shadow(0 0 10px rgba(0, 255, 214, 0.7))
+      drop-shadow(0 0 20px rgba(0, 198, 255, 0.5));
+  }
+  to {
+    filter:
+      drop-shadow(0 0 18px rgba(56, 251, 214, 1))
+      drop-shadow(0 0 36px rgba(0, 198, 255, 0.9));
+  }
+}
+
+.ring-time {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #36fbd8;
+  text-shadow:
+    0 0 16px rgba(0, 255, 214, 0.9),
+    0 0 28px rgba(0, 198, 255, 0.85);
+}
+
+
+.pom-controls {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+.pom-card button {
+  padding: 10px 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #7d2cff 0%, #00c6ff 50%, #38fbd8 100%);
+  color: #ffffff;
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.8),
+    0 0 18px rgba(0, 198, 255, 0.65);
+  transition: 0.22s ease;
+}
+
+.pom-card button:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    0 14px 26px rgba(0, 0, 0, 0.9),
+    0 0 26px rgba(0, 198, 255, 0.9);
+}
+
+.pom-card button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.85),
+    0 0 14px rgba(0, 198, 255, 0.7);
+}
+
+.pom-card button:disabled {
+  opacity: 0.34;
+  cursor: not-allowed;
+  box-shadow: none;
+  background: linear-gradient(135deg, #343a52, #222838);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.btn-outline {
+  background: transparent !important;
+  border-color: rgba(0, 198, 255, 0.7) !important;
+  box-shadow: none !important;
+}
+
+.pom-status {
+  margin-top: 8px;
+  min-height: 22px;
+  font-size: 14px;
+  text-align: center;
+  color: #d7faff;
+}
+
+
+.pom-notes {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pom-notes textarea {
+  width: 100%;
+  min-height: 90px;
+  border-radius: 14px;
+  border: 1px solid rgba(214, 232, 255, 0.4);
+  background: radial-gradient(circle at 0 0, rgba(0, 198, 255, 0.14), rgba(5, 10, 28, 0.96));
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.9);
+  color: #f1f7ff;
+  padding: 10px 12px;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.pom-options {
+  margin-top: 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.pom-options select {
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(214, 232, 255, 0.45);
+  background: rgba(9, 18, 46, 0.96);
+  color: #f5fbff;
+}
+
+.pom-toggles {
+  display: flex;
+  gap: 18px;
+  font-size: 13px;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-pill {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: radial-gradient(circle at top, rgba(0, 198, 255, 0.28), rgba(10, 20, 50, 0.92));
+  border: 1px solid rgba(0, 255, 214, 0.4);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.85);
+}
+
+.stat-label {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.chart-card {
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(8, 15, 32, 0.96);
+  border: 1px solid rgba(0, 255, 214, 0.2);
+  margin-bottom: 12px;
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.85);
+}
+
+.chart-card h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.history-card {
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(8, 15, 32, 0.96);
+  border: 1px solid rgba(0, 255, 214, 0.2);
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.85);
+}
+
+.history-card h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+#pomodoro-session-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+#pomodoro-session-list li {
+  padding: 7px 9px;
+  margin-bottom: 5px;
+  border-radius: 10px;
+  background: rgba(10, 22, 55, 0.98);
+  border: 1px solid rgba(0, 255, 214, 0.35);
+  font-size: 12px;
+}
+
+.pom-card-inner::-webkit-scrollbar,
+.history-card::-webkit-scrollbar {
+  width: 8px;
+}
+
+.pom-card-inner::-webkit-scrollbar-track,
+.history-card::-webkit-scrollbar-track {
+  background: rgba(15, 24, 45, 0.7);
+  border-radius: 10px;
+}
+
+.pom-card-inner::-webkit-scrollbar-thumb,
+.history-card::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #7d2cff, #00c6ff, #38fbd8);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 198, 255, 0.9);
+}
+
+.pom-card-inner::-webkit-scrollbar-thumb:hover,
+.history-card::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #a865ff, #24d1ff, #5fffe0);
+}
+
+</style>

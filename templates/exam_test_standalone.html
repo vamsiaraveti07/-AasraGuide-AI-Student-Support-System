@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exam Helper Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: #e2e8f0;
+            margin-bottom: 15px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #2563eb;
+        }
+        
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #0f172a;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <h1>📚 Exam Helper - Standalone Test</h1>
+    
+    <input type="text" id="topic" placeholder="Enter subject (e.g., DBMS)" value="DBMS">
+    <button id="btn">Generate Guide</button>
+    
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('btn').onclick = function() {
+            console.log("Button clicked!");
+            
+            const topic = document.getElementById('topic').value;
+            const result = document.getElementById('result');
+            const btn = this;
+            
+            if (!topic) {
+                alert("Enter a subject!");
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = "Generating...";
+            result.textContent = "Loading...";
+            
+            fetch('/exam_helper/generate', {
+                method: 'POST',
+                body: new URLSearchParams({ topic: topic }),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                console.log("Success:", data);
+                if (data.ok) {
+                    result.innerHTML = '<h3>✅ Success!</h3><pre>' + data.answer + '</pre>';
+                } else {
+                    result.textContent = 'Error: ' + data.error;
+                }
+            })
+            .catch(err => {
+                console.error("Error:", err);
+                result.textContent = 'Error: ' + err.message;
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = "Generate Guide";
+            });
+        };
+        
+        console.log("Script loaded, button ready!");
+    </script>
+</body>
+</html>

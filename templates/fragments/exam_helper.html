@@ -1,0 +1,554 @@
+<!-- Begin: Exam Helper AI Premium Interface -->
+
+<div class="exam-helper-wrapper">
+    
+    <!-- PREMIUM HEADER -->
+    <div class="premium-header">
+        <div class="header-glow"></div>
+
+        <div class="header-content">
+
+            <!-- Logo -->
+            <div class="header-left">
+                 <img src="{{ url_for('static', filename='logo.png') }}" class="brand-icon">
+                <div class="brand-text">
+                    <h1>AasraGuide</h1>
+                    <p>Your AI Ally</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rest of your layout EXACTLY SAME -->
+    <div class="exam-helper-container">
+        <div class="two-column-layout">
+
+            <!-- Left Card -->
+            <div class="input-card">
+                <div class="card-header"><h3>🎯 Enter Your Subject</h3></div>
+                <input id="exam-topic" class="topic-input" placeholder="e.g., DBMS, Python, Operating Systems" autocomplete="off" onkeypress="if(event.key==='Enter') generateExamGuide()">
+                <button id="generate-exam-btn" class="generate-btn" onclick="generateExamGuide()">
+                    <span class="btn-icon">⚡</span>
+                    Generate Exam Guide
+                </button>
+
+                <div class="suggestions">
+                    <p class="suggestions-title">💡 Popular Subjects</p>
+                    <div class="suggestion-chips">
+                        <span onclick="fillAndGenerate('DBMS')">DBMS</span>
+                        <span onclick="fillAndGenerate('Python')">Python</span>
+                        <span onclick="fillAndGenerate('Data Structures')">DSA</span>
+                        <span onclick="fillAndGenerate('Operating Systems')">OS</span>
+                        <span onclick="fillAndGenerate('Computer Networks')">Networks</span>
+                    </div>
+                </div>
+
+                <div class="history-section">
+                    <div class="history-header">
+                        <h4>📂 Recent Guides</h4>
+                        <button onclick="loadHistory()" class="refresh-btn">⟳</button>
+                    </div>
+                    <div id="history-list" class="history-list">
+                        <p class="loading-text">Loading history...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Card -->
+            <div class="output-card" id="exam-result">
+    
+    <!-- Placeholder (shown before generating result) -->
+    <div id="result-placeholder" class="placeholder">
+        <div class="floating-icon">📘</div>
+        <h3>Your Exam Guide Will Appear Here</h3>
+        <p>Enter a subject and click Generate to get your personalized AI study guide.</p>
+    </div>
+
+    <!-- REAL OUTPUT (hidden initially) -->
+    <div id="exam-result-content" style="
+        white-space: pre-wrap;
+        display: none;
+        line-height: 1.65;
+        font-size: 16px;
+        padding-top: 8px;
+    "></div>
+
+</div>
+
+
+        </div>
+    </div>
+
+</div>
+
+<style>
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #111927 0%, #1a2330 100%);
+    color: #E3EDF7;
+    min-height: 100vh;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* === Wrapper and Content === */
+.exam-helper-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    height: 100vh;
+    width: 100%;
+}
+
+.exam-helper-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+/* === Premium Header === */
+.premium-header {
+    position: relative;
+    background: linear-gradient(90deg, #162139 0%, #27365D 100%);
+    padding: 38px 32px 26px 32px;
+    border-bottom: 1px solid rgba(110,141,199,0.09);
+    box-shadow: 0 12px 36px rgba(45,104,245,0.09);
+}
+
+.header-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.brand-icon {
+    height: 62px;
+    width: 62px;
+    border-radius: 16px;
+    object-fit: cover;
+    box-shadow: 0 0 18px #36e0fe55, 0 0 38px #7746fe22;
+    background: rgba(255,255,255,0.03);
+}
+.brand-text h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #2ee9ef, #4b6bfe, #6a41fe);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+.brand-text p {
+    font-size: 14px;
+    margin: 3px 0 0;
+    opacity: 0.8;
+    font-weight: 500;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.stat-box {
+    padding: 12px 22px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(9px);
+    border: 1px solid rgba(255,255,255,0.13);
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.13);
+    min-width: 88px;
+}
+.stat-number {
+    font-size: 22px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #2ee9ef, #6a41fe);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+.stat-label {
+    font-size: 12px;
+    opacity: 0.7;
+    letter-spacing: 1.5px;
+    font-weight: 400;
+}
+
+/* === Layout Columns === */
+.two-column-layout {
+    display: grid;
+    grid-template-columns: 390px 1fr;
+    gap: 32px;
+    padding: 30px 44px;
+    height: calc(100vh - 140px);  /* header height */
+    box-sizing: border-box;
+    overflow: hidden; /* IMPORTANT */
+}
+.input-card, 
+.output-card {
+    height: 100%;      /* fill the available grid row */
+    max-height: 100%;  
+    min-height: 0;     /* allows scrolling inside */
+    overflow-y: auto;  /* scrolling inside */
+    overflow-x: hidden;
+}
+
+
+
+
+/* === Card Effects === */
+.input-card, .output-card {
+    border-radius: 18px;
+    background: rgba(30,41,59,0.85);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 6px 22px rgba(75,107,254,0.10);
+    border: 1px solid rgba(46,233,239,0.15);
+    padding: 27px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* === Colored Scrollbar for Input Card === */
+.input-card::-webkit-scrollbar {
+    width: 8px;
+}
+.input-card::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #2ee9ef 0%, #6a41fe 100%);
+    border-radius: 6px;
+    border: 2.5px solid #182139;
+}
+.input-card::-webkit-scrollbar-track {
+    background: transparent;
+}
+.input-card {
+    scrollbar-width: thin;
+    scrollbar-color: #6a41fe #162139;
+}
+
+/* Divider Glow on Card Side */
+.input-card {
+    box-shadow: 0 0 0 2px #2ee9ef22, 0 0 40px #6a41fe18;
+}
+
+/* === Card Header Section === */
+.card-header h3 {
+    color: #bfcbe5;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+.input-card {
+    background: linear-gradient(135deg, #162139 0%, #25417b 90%);
+    border-radius: 18px;
+    padding: 27px;
+    border: 1.8px solid #2ee9ef44;
+    box-shadow: 0 8px 28px #2ee9ef28, 0 0 0 2px #2ee9ef22, 0 0 40px #6a41fe18;
+    backdrop-filter: blur(20px);
+    color: #e2e8f0;
+    max-height: calc(100vh - 170px);
+    overflow-y: auto;
+}
+
+/* Premium vertical scrollbar for left panel (Webkit browsers) */
+.input-card::-webkit-scrollbar {
+    width: 8px;
+}
+.input-card::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #2ee9ef 0%, #6a41fe 100%);
+    border-radius: 6px;
+    border: 1.5px solid #182139;
+}
+.input-card::-webkit-scrollbar-track {
+    background: #243147;
+}
+.input-card {
+    scrollbar-width: thin;                        /* Firefox support */
+    scrollbar-color: #6a41fe #1a2330;
+}
+
+
+/* === Input Field === */
+.topic-input {
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: 13px;
+    background: rgba(255,255,255,0.09);
+    border: 1.5px solid #2ee9ef33;
+    color: #e2e8f0;
+    font-size: 15px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.topic-input:focus {
+    outline: none;
+    border-color: #6a41fe;
+    box-shadow: 0 0 0 4px #36e0fe22;
+    background: rgba(255,255,255,0.14);
+}
+
+/* === Premium Generate Button === */
+.generate-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: 13px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    color: #fff;
+    background: linear-gradient(90deg, #2ee9ef 20%, #4b6bfe 60%, #6a41fe 100%);
+    border: none;
+    box-shadow: 0 8px 24px rgba(46,233,239,0.13);
+    transition: background 0.15s, transform 0.18s;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.btn-icon {
+    font-size: 18px;
+    margin-right: 0px;
+    /* Premium style: star emoji */
+}
+.generate-btn:hover {
+    background: linear-gradient(270deg, #6a41fe 0%, #4b6bfe 40%, #2ee9ef 100%);
+    box-shadow: 0 12px 32px rgba(46,233,239,0.21);
+    transform: translateY(-2px) scale(1.04);
+}
+
+/* === Suggestions === */
+.suggestions {
+    margin-top: 19px;
+    padding-top: 17px;
+    border-top: 1px solid #243147;
+}
+.suggestions-title {
+    color: #73b4fa;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 9px;
+}
+.suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+.suggestion-chips span {
+    background: linear-gradient(90deg, #2953b8 0%, #48cad9 100%);
+    color: #fff;
+    border: none;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 15px;
+    font-size: 13px;
+    margin: 2px 6px 2px 0;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, transform 0.22s;
+}
+.suggestion-chips span:hover {
+    background: linear-gradient(90deg, #6a41fe 0%, #2ee9ef 100%);
+    color: #fff;
+    transform: scale(1.07) translateY(-2px);
+}
+
+/* === History Section === */
+.history-section {
+    margin-top: 19px;
+    padding-top: 17px;
+    border-top: 1px solid #243147;
+}
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.history-header h4 {
+    color: #bfcbe5;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+/* Glow on reload/refresh button */
+.refresh-btn {
+    background: linear-gradient(90deg, #2ee9ef 0%, #6a41fe 100%);
+    color: #fff;
+    font-size: 16px;
+    box-shadow: 0 2px 12px #6a41fe44;
+    border: none;
+    border-radius: 10px;
+    padding: 9px 13px;
+    cursor: pointer;
+    transition: background 0.17s, box-shadow 0.16s, transform 0.2s;
+    outline: none;
+    margin-left: 6px;
+}
+.refresh-btn:active, .refresh-btn:focus, .refresh-btn:hover {
+    background: linear-gradient(90deg, #6a41fe 0%, #2ee9ef 100%);
+    box-shadow: 0 4px 12px #2ee9ef22;
+    transform: scale(1.11);
+}
+
+.history-list {
+    max-height: 230px;
+    overflow-y: auto;
+    margin-top: 9px;
+}
+.history-item {
+    padding: 11px 12px;
+    border-radius: 14px;
+    background: rgba(46,233,239,0.13);
+    border-left: 3px solid #6a41fe;
+    color: #d5e7fa;
+    box-shadow: 0 2px 8px #6a41fe11;
+    margin-bottom: 9px;
+    cursor: pointer;
+    transition: background 0.19s, transform 0.16s, color 0.2s;
+}
+.history-item:hover {
+    background: #27468f44;
+    color: #fff;
+    transform: translateX(6px);
+}
+.loading-text {
+    color: #6a8cc9;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* === Output Card (Fixed Height + Scroll) === */
+.output-card {
+    background: rgba(35,41,59,0.89);
+    border: 1px solid #4b6bfe22;
+    backdrop-filter: blur(16px);
+
+    /* IMPORTANT FIXES */
+    height: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    color: #e3edf7;
+    box-shadow: 0 12px 38px #6a41fe13;
+    padding: 29px;
+    display: flex;
+    flex-direction: column;
+}
+
+.output-card::-webkit-scrollbar {
+    width: 10px;
+}
+
+.output-card::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #6a41fe 0%, #2ee9ef 100%);
+    border-radius: 6px;
+}
+
+.output-card::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.output-card {
+    scrollbar-width: thin;
+    scrollbar-color: #6a41fe #1a2330;
+}
+
+.placeholder {
+    text-align:center;
+    padding:80px 30px 0 30px;
+}
+.floating-icon {
+    font-size:70px;
+    animation: float 3s ease-in-out infinite;
+    /* Premium: change to book emoji 📘 or SVG for more style */
+}
+@keyframes float {
+    0%,100% { transform: translateY(0);}
+    50% { transform: translateY(-17px);}
+}
+.placeholder h3 {
+    color:#cbd5e1;
+    margin-bottom:12px;
+    font-size:21px;
+    font-weight:600;
+}
+.placeholder p {
+    color:#74bff9;
+    font-size:15px;
+}
+
+/* Responsive for mobile/tablet */
+@media (max-width: 1200px) {
+    .two-column-layout {
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 20px;
+        height: auto;
+    }
+    .input-card, .output-card {
+        min-height: 340px;
+        height: auto;
+        padding: 18px;
+    }
+    .premium-header {
+        padding: 27px 14px;
+    }
+}
+@media (max-width: 750px) {
+    .premium-header {
+        padding: 16px 4px 8px 4px;
+    }
+    .two-column-layout {
+        padding: 6px;
+    }
+    .brand-text h1 { font-size: 20px;}
+}
+.section-content {
+    white-space: pre-wrap !important;
+    line-height: 1.65;
+    font-size: 16px;
+    padding-top: 10px;
+}
+
+
+
+</style>
+
+<!-- JS: Guide Counter Example -->
+<script>
+function updateGuideCount() {
+    fetch('/api/exam_helper/history?limit=1')
+    .then(r => r.json())
+    .then(data => {
+        if (data.ok && data.history) {
+            document.getElementById('total-guides').textContent = data.history.length > 0 ? data.history.length + '+' : '0';
+        }
+    });
+}
+// Initialization script
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("✅ Premium Exam Helper loaded");
+    setTimeout(loadHistory, 500);
+    updateGuideCount();
+});
+</script>

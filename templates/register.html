@@ -1,0 +1,187 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>AasraGuide - Register</title>
+
+    <style>
+        body {
+            background: radial-gradient(circle at top center, #0f1c30 0%, #02040a 100%);
+            margin: 0;
+            height: 100vh;
+            font-family: "Inter", sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e2e8f0;
+        }
+        
+        .card {
+            width: 430px;
+            padding: 42px 36px;
+            margin: 0 auto; /* ensures center */
+            display: flex;
+            flex-direction: column;
+            align-items: center;   /* centers everything inside */
+        }
+        .reg-title {
+    font-size: 30px;
+    font-weight: 900;
+    margin-bottom: 30px;
+    text-align: center;
+    letter-spacing: 0.6px;
+
+    background: linear-gradient(90deg,#2ee9ef,#4b6bfe,#6a41fe);
+    -webkit-background-clip: text;
+    color: transparent;
+
+    text-shadow: 0 0 14px rgba(78,109,255,0.25);
+}
+
+
+
+        .card form {
+            width: 100%;   
+        }
+
+        label {
+            width: 100%;
+        }
+
+        .input {
+            width: 100%;
+            box-sizing: border-box;  
+        }
+
+        .logo {
+            width: 84px;
+            height: 84px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            box-shadow:
+                0 0 18px #36e0fe55,
+                0 0 38px #7746fe22,
+                inset 0 0 6px rgba(255,255,255,0.06);
+        }
+        h2 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #2ee9ef, #4b6bfe, #6a41fe);
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 26px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: block;
+            text-align: left;
+            margin-bottom: 6px;
+            margin-top: 14px;
+        }
+
+        .input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            color: #e2e8f0;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow:
+                inset 0 0 4px rgba(0,0,0,0.4),
+                0 0 12px rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            transition: 0.25s ease;
+        }
+        .input:focus {
+            border-color: #4b6bfe;
+            box-shadow:
+                0 0 0 3px rgba(75,107,254,0.3),
+                inset 0 0 6px rgba(255,255,255,0.07);
+            outline: none;
+        }
+        .cta-btn {
+            width: 100%;
+            margin-top: 26px;
+            padding: 14px;
+            font-size: 17px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #2d8cff, #1767d6);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            box-shadow: 0 8px 26px rgba(46,130,255,0.5);
+            transition: 0.25s ease;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(46,130,255,0.6);
+        }
+
+        .bottom-text {
+            margin-top: 18px;
+            color: #cbd5e1;
+        }
+
+        .bottom-text a {
+            color: #4aa8ff;
+            text-decoration: none;
+        }
+        .bottom-text a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="card">
+
+        <!-- Logo -->
+        <img src="{{ url_for('static', filename='logo.png') }}" class="logo">
+
+        <h2 class="reg-title">Begin Your Journey with Your AI Ally</h2>
+
+
+
+        <!-- Register Form -->
+        <form method="POST">
+
+            <label>Full Name</label>
+            <input name="fullname" class="input" placeholder="e.g.,Tarak Nandhamuri">
+
+            <label>Username</label>
+            <input name="username" class="input" placeholder="e.g., tarak123">
+
+            <label>Password</label>
+            <input name="password" class="input" type="password" placeholder="Create a strong password">
+
+            <label>Confirm Password</label>
+            <input name="confirm_password" class="input" type="password" placeholder="Re-enter your password">
+
+            <button type="submit" class="cta-btn">Register</button>
+        </form>
+
+        <div class="bottom-text">
+            Already have an account?  
+            <a href="{{ url_for('login') }}">Login here</a>
+        </div>
+
+    </div>
+
+</body>
+</html>

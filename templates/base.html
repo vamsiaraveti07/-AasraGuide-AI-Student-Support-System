@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Student Support</title>
+
+  <!-- icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <!-- main style -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="{{ url_for('static', filename='notes.js') }}"></script>
+
+
+
+
+
+</head>
+<body>
+
+<div class="layout">
+
+{% if current_user.is_authenticated %}
+<aside class="sidebar" id="sidebar">
+
+  <!-- TOP BRAND -->
+  <div class="sidebar-top">
+      <div class="brand">
+          <img src="{{ url_for('static', filename='logo.png') }}" class="brand-icon">
+          <div>
+              <div class="brand-title">AasraGuide</div>
+              <div class="brand-sub">Your AI Ally</div>
+          </div>
+      </div>
+
+      <a href="{{ url_for('new_chat') }}" class="new-chat-btn">
+          <i class="fa-solid fa-plus"></i> New Chat
+      </a>
+
+      <div class="sidebar-title">Chats</div>
+  </div>
+
+
+  <!-- SCROLL AREA (ONLY CHATS SCROLL!) -->
+  <div class="sidebar-scroll">
+
+      <div id="activeList" class="chat-list">
+          {% for s in chat_sessions if not s.archived %}
+          <div class="chat-row" data-sid="{{ s.id }}">
+              <a class="chat-item {% if session and session.id == s.id %}active{% endif %}"
+                 href="{{ url_for('chat', session_id=s.id) }}">
+                  <i class="fa-regular fa-message"></i>
+                  <span class="chat-title">{{ s.title }}</span>
+              </a>
+          </div>
+          {% endfor %}
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <div class="arch-toggle">
+          <i class="fa-regular fa-folder"></i> Archived
+          <i class="fa-solid fa-chevron-down" style="margin-left:auto"></i>
+      </div>
+
+      <div id="archivedList" class="chat-list archived">
+          {% for s in chat_sessions if s.archived %}
+          <div class="chat-row" data-sid="{{ s.id }}">
+              <a class="chat-item" href="{{ url_for('chat', session_id=s.id) }}">
+                  <i class="fa-regular fa-folder"></i>
+                  {{ s.title }}
+              </a>
+          </div>
+          {% endfor %}
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+
+      <!-- FEATURE BUTTONS -->
+      <button class="feature-btn" onclick="openFeature('assignments')">
+        <img src="{{ url_for('static', filename='icons/Assignment.png') }}" class="side-icon">
+        Assignments
+      </button>
+
+      <button id="notes-btn" class="feature-btn">
+        <img src="{{ url_for('static', filename='icons/notes.png') }}" class="side-icon">
+        Notes
+      </button>
+
+      <button class="feature-btn" onclick="openFeature('exam_helper')">
+        <img src="{{ url_for('static', filename='icons/Exam.png') }}" class="side-icon">
+        Exam Helper
+      </button>
+
+      <button class="feature-btn" onclick="openFeature('pomodoro')">
+        <img src="{{ url_for('static', filename='icons/pomo.png') }}" class="side-icon">
+        Pomodoro
+      </button>
+
+  </div>
+
+
+  <!-- FIXED FOOTER -->
+  <div class="sidebar-footer">
+      <div class="user-chip"><i class="fa-solid fa-user"></i> {{ current_user.username }}</div>
+      <a class="logout" href="{{ url_for('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </div>
+
+</aside>
+
+{% endif %}
+
+<main class="main-area">
+  {% if current_user.is_authenticated %}
+  
+  {% endif %}
+
+  <!-- FEATURE PANEL -->
+  <div id="feature-panel" class="feature-panel" style="display:none;"></div>
+
+  <!-- CHAT PAGE -->
+  <section id="main-panel" class="page-container">
+    {% block content %}{% endblock %}
+  </section>
+</main>
+
+</div>
+
+<!-- Rename modal -->
+<div id="renameModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:999;">
+  <div style="background:#0d151a;padding:18px;border-radius:12px;width:340px;">
+    <h3 style="color:#fff;margin-bottom:10px;">Rename chat</h3>
+    <input id="renameInput" style="width:100%;padding:10px;border-radius:8px;background:#071218;color:white;border:1px solid rgba(255,255,255,0.06)">
+    <div style="margin-top:12px;text-align:right;">
+      <button id="renameCancel" class="btn ghost">Cancel</button>
+      <button id="renameSave" class="btn primary">Save</button>
+    </div>
+  </div>
+</div>
+<!-- IMAGE LIGHTBOX -->
+<div id="img-lightbox" style="
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+">
+    <img id="lightbox-img" style="
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 12px;
+        box-shadow: 0 0 25px rgba(0,0,0,0.8);
+    ">
+</div>
+
+<script>
+/* ------------- Global Menu, Modal, and Lightbox Logic ------------- */
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Image lightbox (notes preview)
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('note-img-thumb')) {
+      const src = e.target.getAttribute('src');
+      const lb = document.getElementById('img-lightbox');
+      const img = document.getElementById('lightbox-img');
+      img.src = src;
+      lb.style.display = 'flex';
+    }
+  });
+  document.getElementById('img-lightbox')?.addEventListener('click', function() {
+    this.style.display = 'none';
+    document.getElementById('lightbox-img').src = "";
+  });
+
+
+  // Main/side menu logic
+  const closeMenus = () =>
+    document.querySelectorAll(".chat-menu").forEach(m => m.classList.remove("open"));
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".chat-menu") && !e.target.closest(".chat-menu-btn"))
+      closeMenus();
+  });
+  document.querySelectorAll(".chat-menu-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeMenus();
+      const sid = btn.dataset.id;
+      const menu = document.getElementById("chat-menu-" + sid);
+      const rect = btn.getBoundingClientRect();
+      menu.style.top = (rect.bottom + window.scrollY + 6) + "px";
+      menu.style.left = (rect.left + window.scrollX - 120) + "px";
+      menu.classList.add("open");
+    });
+  });
+
+
+  // Archive section toggle
+  const archList = document.getElementById("archivedList");
+  const archToggle = document.getElementById("archToggle");
+  if (archToggle) {
+    archToggle.addEventListener("click", () => {
+      const icon = archToggle.querySelector(".fa-chevron-down");
+      const isOpen = archList.style.display === "block";
+      archList.style.display = isOpen ? "none" : "block";
+      icon.style.transform = isOpen ? "rotate(0deg)" : "rotate(180deg)";
+    });
+  }
+
+  // Rename Modal
+  const modal = document.getElementById("renameModal");
+  const input = document.getElementById("renameInput");
+  let renameID = null;
+  function showRename(sid, cur) {
+    renameID = sid;
+    input.value = cur;
+    modal.classList.remove("hidden");
+    input.focus();
+  }
+  function hideRename() { modal.classList.add("hidden"); }
+  document.getElementById("renameCancel")?.addEventListener('click', hideRename);
+  document.getElementById("renameSave")?.addEventListener('click', async () => {
+    const newTitle = input.value.trim();
+    if (!renameID) return hideRename();
+    const res = await fetch(`/rename_chat/${renameID}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ new_title: newTitle })
+    });
+    const json = await res.json();
+    if (json.ok) {
+      document.querySelector(`.chat-row[data-sid='${renameID}'] .chat-title`).textContent = json.title;
+    }
+    hideRename();
+  });
+  document.querySelectorAll(".rename-btn").forEach(btn =>
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      const ct = document.querySelector(`.chat-row[data-sid='${id}'] .chat-title`).textContent;
+      showRename(id, ct);
+    })
+  );
+
+  // Delete/archive/unarchive (chat sidebar events)
+  async function post(url) {
+    return fetch(url, { method: "POST", headers: { "X-Requested-With": "XMLHttpRequest" } }).then(r => r.json());
+  }
+  document.body.addEventListener("click", async (e) => {
+    const d = e.target.dataset;
+    if (e.target.classList.contains("delete-btn")) {
+      const ok = confirm("Delete this chat?");
+      if (!ok) return;
+      const j = await post(`/delete_chat/${d.id}`);
+      if (j.ok) document.querySelector(`.chat-row[data-sid='${d.id}']`)?.remove();
+    }
+    if (e.target.classList.contains("archive-btn")) {
+      const j = await post(`/archive_chat/${d.id}`);
+      if (j.ok) location.reload();
+    }
+    if (e.target.classList.contains("unarchive-btn")) {
+      const j = await post(`/unarchive_chat/${d.id}`);
+      if (j.ok) location.reload();
+    }
+  });
+
+  // Main/feature panel switching
+  window.openFeature = function(name) {
+  document.getElementById("main-panel").style.display = "none";
+  const fp = document.getElementById("feature-panel");
+  fp.style.display = "block";
+  fp.innerHTML = "<p style='padding:20px'>Loading...</p>";
+
+  fetch(`/fragment/${name}`)
+    .then(r => r.text())
+    .then(html => {
+      fp.innerHTML = html;
+      if (name === "pomodoro" && window.initPomodoro) window.initPomodoro();
+  
+    })
+    .catch(() => fp.innerHTML = "<p style='padding:20px;color:red'>Failed to load.</p>");
+};
+
+
+  // =============== ASSIGNMENTS ===============
+  document.body.addEventListener('click', function(e) {
+    // Add Assignment
+    if (e.target.id === 'addBtn' || e.target.closest('#addBtn')) {
+      const formBox = document.getElementById('formBox');
+      if (formBox) {
+        formBox.classList.remove('hide');
+        const titleInput = document.getElementById('title');
+        if (titleInput) titleInput.value = '';
+        const subjectInput = document.getElementById('subject');
+        if (subjectInput) subjectInput.value = '';
+        const dueDateInput = document.getElementById('dueDate');
+        if (dueDateInput) dueDateInput.value = '';
+        const notesInput = document.getElementById('notes');
+        if (notesInput) notesInput.value = '';
+        const formTitle = document.getElementById('formTitle');
+        if (formTitle) formTitle.textContent = 'New Assignment';
+      }
+    }
+    // Cancel Assignment
+    if (e.target.id === 'cancelBtn' || e.target.closest('#cancelBtn')) {
+      const formBox = document.getElementById('formBox');
+      if (formBox) formBox.classList.add('hide');
+    }
+    // Save Assignment
+    if (e.target.id === 'saveBtn' || e.target.closest('#saveBtn')) {
+      handleSaveAssignment();
+    }
+    // Edit Assignment
+    if (e.target.classList.contains('btn-edit') || e.target.closest('.btn-edit')) {
+      const btn = e.target.classList.contains('btn-edit') ? e.target : e.target.closest('.btn-edit');
+      const id = parseInt(btn.getAttribute('data-id'));
+      handleEditAssignment(id);
+    }
+    // Delete Assignment
+    if (e.target.classList.contains('btn-delete') || e.target.closest('.btn-delete')) {
+      const btn = e.target.classList.contains('btn-delete') ? e.target : e.target.closest('.btn-delete');
+      const id = parseInt(btn.getAttribute('data-id'));
+      handleDeleteAssignment(id);
+    }
+  });
+
+  async function handleSaveAssignment() {
+    const title = document.getElementById('title')?.value.trim();
+    const subject = document.getElementById('subject')?.value.trim();
+    const dueDate = document.getElementById('dueDate')?.value;
+    const notes = document.getElementById('notes')?.value.trim();
+    if (!title) {
+      alert('Please enter a title');
+      return;
+    }
+    const data = { title, subject, due_date: dueDate || null, notes };
+    try {
+      const res = await fetch('/api/assignments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      if (result.ok || res.ok) {
+        alert('✓ Assignment saved successfully!');
+        openFeature('assignments');
+      } else {
+        alert('Error: ' + (result.error || 'Failed to save'));
+      }
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+  async function handleEditAssignment(id) {
+    try {
+      const res = await fetch('/api/assignments');
+      const items = await res.json();
+      const item = items.find(a => a.id === id);
+      if (item) {
+        document.getElementById('title').value = item.title || '';
+        document.getElementById('subject').value = item.subject || '';
+        document.getElementById('dueDate').value = item.due_date || '';
+        document.getElementById('notes').value = item.notes || '';
+        document.getElementById('formTitle').textContent = 'Edit Assignment';
+        document.getElementById('formBox').classList.remove('hide');
+      }
+    } catch (err) {
+      alert('Error loading assignment');
+    }
+  }
+  async function handleDeleteAssignment(id) {
+    if (!confirm('Delete this assignment?')) return;
+    try {
+      const res = await fetch(`/api/assignments/${id}`, { method: 'DELETE' });
+      const result = await res.json();
+      if (result.ok) {
+        alert('✓ Assignment deleted!');
+        openFeature('assignments');
+      }
+    } catch (err) {
+      alert('Error deleting assignment');
+    }
+  }
+
+  // Notes quicklink
+  document.getElementById('notes-btn')?.addEventListener('click', function() {
+    fetch('/fragment/notes')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('feature-panel').innerHTML = html;
+        setTimeout(() => {
+          if (typeof initQuickNotes === "function") initQuickNotes();
+        }, 60);
+      });
+  });
+});
+
+// Load history with delete buttons
+window.loadHistory = function() {
+    console.log("📂 Loading history...");
+    
+    var historyList = document.getElementById('history-list');
+    if (!historyList) {
+        console.log("History list not found");
+        return;
+    }
+    
+    historyList.innerHTML = '<p class="loading-text">Loading...</p>';
+    
+    fetch('/api/exam_helper/history?limit=10')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            console.log("History data:", data);
+            
+            if (data.ok && data.history && data.history.length > 0) {
+                var html = '';
+                data.history.forEach(function(item) {
+                    // Escape content for HTML attribute
+                    var escapedContent = item.content
+                        .replace(/\\/g, '\\\\')
+                        .replace(/'/g, "\\'")
+                        .replace(/"/g, '&quot;')
+                        .replace(/\n/g, '\\n');
+                    
+                    html += 
+                        '<div class="history-item">' +
+                        '<div class="history-item-content" onclick="viewHistoryItem(\'' + 
+                        item.topic.replace(/'/g, "\\'") + '\', \'' + 
+                        escapedContent + '\')">' +
+                        '<div class="history-topic">' + item.topic + '</div>' +
+                        '<div class="history-date">' + item.created_at + '</div>' +
+                        '</div>' +
+                        '<div class="history-actions">' +
+                        '<button class="view-btn" onclick="viewHistoryItem(\'' + 
+                        item.topic.replace(/'/g, "\\'") + '\', \'' + 
+                        escapedContent + '\')">👁️</button>' +
+                        '<button class="delete-btn" onclick="deleteHistoryItem(event, ' + item.id + ')">🗑️</button>' +
+                        '</div>' +
+                        '</div>';
+                });
+                historyList.innerHTML = html;
+                console.log("✅ History loaded");
+            } else {
+                historyList.innerHTML = '<p class="loading-text">No history yet. Generate your first guide!</p>';
+            }
+        })
+        .catch(function(err) {
+            console.error("❌ Error loading history:", err);
+            historyList.innerHTML = '<p class="loading-text" style="color: #ef4444;">Failed to load</p>';
+        });
+};
+
+// Delete history item
+window.deleteHistoryItem = function(event, itemId) {
+    // Stop propagation to prevent triggering the view function
+    event.stopPropagation();
+    
+    if (!confirm('Delete this exam guide?')) {
+        return;
+    }
+    
+    console.log("🗑️ Deleting item:", itemId);
+    
+    fetch('/api/exam_helper/delete/' + itemId, {
+        method: 'DELETE'
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.ok) {
+            console.log("✅ Deleted successfully");
+            loadHistory(); // Reload history
+        } else {
+            alert('Failed to delete: ' + data.error);
+        }
+    })
+    .catch(function(err) {
+        console.error("❌ Delete error:", err);
+        alert('Error deleting item');
+    });
+};
+
+// View history item
+window.viewHistoryItem = function(topic, content) {
+    console.log("📖 Viewing:", topic);
+    
+    var outputBox = document.getElementById('exam-result');
+    if (!outputBox) {
+        console.error("Output box not found");
+        return;
+    }
+    
+    // Unescape content
+    var unescapedContent = content
+        .replace(/\\n/g, '\n')
+        .replace(/\\'/g, "'")
+        .replace(/&quot;/g, '"');
+    
+    var html = formatExamGuide(topic, unescapedContent);
+    outputBox.innerHTML = html;
+    outputBox.scrollTop = 0;
+    
+    console.log("✅ History item displayed");
+};
+
+// Fill and generate
+window.fillAndGenerate = function(subject) {
+    var topicInput = document.getElementById('exam-topic');
+    if (topicInput) {
+        topicInput.value = subject;
+        generateExamGuide();
+    }
+};
+
+// Generate exam guide
+window.generateExamGuide = function() {
+    console.log("🔘 Generate clicked");
+    
+    var topicInput = document.getElementById("exam-topic");
+    var generateBtn = document.getElementById("generate-exam-btn");
+    var outputBox = document.getElementById("exam-result");
+    
+    if (!topicInput || !generateBtn || !outputBox) {
+        console.error("❌ Elements not found");
+        return;
+    }
+    
+    var topic = topicInput.value.trim();
+    console.log("Topic:", topic);
+    
+    if (!topic) {
+        outputBox.innerHTML = '<div class="placeholder"><p style="color: #ef4444;">⚠️ Please enter a subject!</p></div>';
+        return;
+    }
+    
+    // Loading state
+    generateBtn.disabled = true;
+    generateBtn.textContent = "⏳ Generating...";
+    outputBox.innerHTML = 
+        '<div class="loading-state">' +
+        '<div class="loading-spinner"></div>' +
+        '<h3 style="color: #94a3b8; margin-bottom: 10px;">Analyzing ' + topic + '...</h3>' +
+        '<p style="color: #64748b; font-size: 14px;">AI is preparing your guide</p>' +
+        '</div>';
+    
+    console.log("📡 Fetching...");
+    
+    fetch("/exam_helper/generate", {
+        method: "POST",
+        body: new URLSearchParams({ topic: topic }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" }
+    })
+    .then(function(r) {
+        console.log("Response:", r.status);
+        return r.json();
+    })
+    .then(function(data) {
+        console.log("Data received:", data.ok);
+        
+        if (data.ok) {
+            var html = formatExamGuide(topic, data.answer);
+            outputBox.innerHTML = html;
+            topicInput.value = "";
+            outputBox.scrollTop = 0;
+            
+            // Reload history
+            setTimeout(loadHistory, 500);
+            
+            console.log("✅ Guide displayed");
+        } else {
+            outputBox.innerHTML = '<div class="placeholder"><p style="color: #ef4444;">❌ ' + data.error + '</p></div>';
+        }
+    })
+    .catch(function(err) {
+        console.error("❌ Error:", err);
+        outputBox.innerHTML = '<div class="placeholder"><p style="color: #ef4444;">❌ Error: ' + err.message + '</p></div>';
+    })
+    .finally(function() {
+        generateBtn.disabled = false;
+        generateBtn.textContent = "🔍 Generate Exam Guide";
+    });
+};
+
+// Format guide
+function formatExamGuide(topic, content) {
+    var cleaned = content.trim();
+
+    
+    return '<div class="content-header">' +
+        '<h3>📚 ' + topic + ' - Exam Preparation Guide</h3>' +
+        '</div>' +
+        '<div class="section-content">' + cleaned + '</div>' +
+        '<div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #334155; color: #10b981; text-align: center;">' +
+        '✅ Guide saved to history!' +
+        '</div>';
+}
+
+document.getElementById('open-pomodoro').onclick = function () {
+  fetch('/fragment/pomodoro')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('main').innerHTML = html;
+      if (window.initPomodoro) {
+        window.initPomodoro();
+      }
+    });
+};
+
+
+
+
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+
+<script src="{{ url_for('static', filename='pomodoro.js') }}"></script>
+
+
+
+
+</body>
+</html>

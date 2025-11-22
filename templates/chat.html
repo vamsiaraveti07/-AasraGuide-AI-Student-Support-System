@@ -1,0 +1,768 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+
+.chat-page {
+  display: flex;
+  gap: 18px;
+  height: 100%;
+}
+
+/* MAIN COLUMN */
+.chat-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* CHAT STREAM */
+.chat-stream {
+  flex: 1;
+  padding: 22px;
+  overflow-y: auto;
+}
+
+/* MESSAGE ROWS */
+.msg-row {
+  display: flex;
+  gap: 14px;
+  padding: 22px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.msg-row.left { flex-direction: row; }
+.msg-row.right { flex-direction: row-reverse; }
+
+/* AVATARS */
+.msg-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 6px;
+  background:transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: 600;
+}
+
+.msg-avatar.user { background: transparent; }
+
+/* CONTENT – NO BUBBLE BOX */
+.msg-content {
+  max-width: 70%;
+  color: #eaf3ff;
+}
+
+.msg-content .meta {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+
+.msg-content .text {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+/* INPUT */
+.chat-input {
+  display: flex;
+  padding: 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.chat-input textarea {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  resize: none;
+  background: #0c121b;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: white;
+  font-size: 1rem;
+}
+
+.send-btn {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin-left: 10px;
+  margin-top: auto;
+  margin-bottom: auto;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-btn:hover {
+  transform: scale(1.1);
+}
+
+.send-icon {
+  width: 80px;      
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px #0ea5e9); /* neon glow */
+  transition: 0.2s ease;
+}
+
+/* RIGHT PANEL */
+.side-column {
+  width: 310px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Empty state */
+.rem-empty {
+  text-align: center;
+  opacity: 0.6;
+  padding: 12px 0;
+}
+
+/* Reminder item upgrade */
+.rem-item {
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(0,255,214,0.25);
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: 0.25s ease;
+  animation: fadeSlide 0.25s ease;
+}
+
+.rem-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 22px rgba(0,255,214,0.25);
+}
+
+/* Title row */
+.rem-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rem-title {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.rem-title.done {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+/* Delete button */
+.rem-delete-btn {
+  background: transparent;
+  color: #ff6b6b;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.rem-delete-btn:hover {
+  color: #ff8c8c;
+}
+
+/* Priority tags */
+.priority-badge {
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+
+.priority-high { color: #ff7b7b; }
+.priority-medium { color: #ffd47e; }
+.priority-low { color: #88ffb0; }
+
+/* Due status */
+.due {
+  opacity: 0.8;
+}
+
+.due.today { color: #4afaff; font-weight: 700; }
+.overdue { color: #ff6b6b; font-weight: 700; }
+
+/* Progress bar */
+.rem-progress {
+  height: 7px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.rem-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00fff2, #7d2cff);
+  box-shadow: 0 0 10px rgba(0,255,214,0.7);
+  transition: width 0.3s ease;
+}
+
+/* Notes */
+.rem-notes-toggle {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.rem-notes-toggle:hover {
+  opacity: 1;
+}
+
+.rem-notes {
+  display: none;
+  padding-top: 8px;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  line-height: 1.4;
+}
+/* Ring wrapper */
+.rem-ring-wrap {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+
+.rem-ring {
+  transform: rotate(-90deg);
+}
+
+.ring-bg {
+  fill: none;
+  stroke: rgba(255,255,255,0.15);
+  stroke-width: 5;
+}
+
+.ring-fg {
+  fill: none;
+  stroke: url(#aasraGradient);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 125;
+  stroke-dashoffset: 125;
+  transition: stroke-dashoffset 0.3s linear;
+  filter:
+    drop-shadow(0 0 8px rgba(0,255,214,0.65))
+    drop-shadow(0 0 16px rgba(0,198,255,0.55));
+}
+
+.ring-text {
+  position: absolute;
+  inset: 0;
+  font-size: 0.75rem;
+  color: #aafaff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 0 4px #00ffe7;
+}
+
+/* Countdown text */
+.rem-countdown {
+  font-size: 0.8rem;
+  color: #b4eaff;
+  opacity: 0.85;
+  margin-top: 3px;
+}
+
+
+/* Slide animation */
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+.side-column.hidden { display: none; }
+
+.show-panel-btn {
+  position: fixed;
+  right: 20px;
+  bottom: 90px;
+  background: #b10e75ff;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: none;
+  border: none;
+}
+.typing-dots span {
+  animation: blink 1s infinite;
+  opacity: 0.4;
+}
+
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+  0% { opacity: .2; }
+  50% { opacity: 1; }
+  100% { opacity: .2; }
+}
+.feature-header {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.feature-section {
+  margin-bottom: 20px;
+}
+
+.add-btn, .save-btn, .start-btn {
+  padding: 10px 14px;
+  background: #0ea56b;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  margin-top: 10px;
+}
+
+.diary-box {
+  width: 100%;
+  height: 120px;
+  background: #0c1a2a;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: white;
+  padding: 10px;
+}
+
+.pomodoro-timer {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+/* Hide scrollbar for chat stream but keep scrolling */
+.chat-stream::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+.chat-stream {
+    -ms-overflow-style: none;  /* IE/Edge */
+    scrollbar-width: none;     /* Firefox */
+}
+.msg-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px; /* square-rounded like ChatGPT */
+  overflow: hidden; /* THIS crops big images */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 0 12px rgba(0, 200, 255, 0.25); /* subtle glow */
+  flex-shrink: 0;
+}
+
+/* circular avatar option (if you want perfect circle) */
+.msg-avatar.bot {
+  border-radius: 14px;
+}
+
+.msg-avatar.user {
+  border-radius: 14px;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;       /* crop nicely */
+  object-position: center; /* center the face */
+  display: block;
+}
+
+
+</style>
+
+
+<div class="chat-page">
+
+  <!-- LEFT CHAT -->
+  <div class="chat-column">
+
+    <div id="chat-box" class="chat-stream">
+      {% if recent_messages|length == 0 %}
+      <p style="opacity:0.6;text-align:center;margin-top:40px;">
+        Start chatting 👋
+      </p>
+      {% endif %}
+
+      {% for m in recent_messages %}
+      <div class="msg-row {% if m.emotion == 'bot_reply' %}left{% else %}right{% endif %}">
+        
+        {% if m.emotion == "bot_reply" %}
+        <div class="msg-avatar bot">
+          <img src="{{ url_for('static', filename='icons/bot.png') }}" class="avatar-img">
+        </div>
+        {% endif %}
+
+
+        <div class="msg-content">
+          <div class="meta">
+            {% if m.emotion == "bot_reply" %}AI{% else %}You{% endif %} • {{ m.created_at.strftime('%H:%M') }}
+          </div>
+          <div class="text">{{ m.text | safe }}</div>
+        </div>
+
+       {% if m.emotion == "user" %}
+      <div class="msg-avatar user">
+        <img src="{{ url_for('static', filename='icons/user.png') }}" class="avatar-img">
+      </div>
+      {% endif %}
+
+
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- INPUT -->
+    <form id="chat-form" class="chat-input" data-session="{{ session.id }}">
+      <textarea id="message" placeholder="Message Student AI..."></textarea>
+      <button class="send-btn">
+        <img src="{{ url_for('static', filename='icons/send.png') }}" class="send-icon">
+      </button>
+
+    </form>
+
+    <button id="showPanelBtn" class="show-panel-btn" onclick="showPanel()">Show Panel</button>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <!-- RIGHT PANEL -->
+<aside class="side-column" id="rightPanel">
+
+  <!-- Reminders Card -->
+  <div class="panel-card" id="reminderPanel">
+    <h3><i class="fa-solid fa-bell"></i> Reminders</h3>
+
+    <div id="reminderContent">
+      <p style="opacity:0.6;">Loading reminders...</p>
+    </div>
+  </div>
+
+  <!-- Feature Dynamic Panel (Assignments, Notes, Pomodoro, etc) -->
+  <div id="side-panel-content"></div>
+
+</aside>
+
+
+</div>
+
+
+<script>
+function hidePanel() {
+  document.getElementById("rightPanel").classList.add("hidden");
+  document.getElementById("showPanelBtn").style.display = "block";
+}
+
+function showPanel() {
+  document.getElementById("rightPanel").classList.remove("hidden");
+  document.getElementById("showPanelBtn").style.display = "none";
+}
+
+/* ===============================
+   CHAT Sending
+================================ */
+
+document.getElementById("chat-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const input = document.getElementById("message");
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  appendUser(msg);
+  input.value = "";
+
+  showTyping();
+
+  const res = await fetch(`/send/${e.target.dataset.session}`, {
+    method: "POST",
+    body: new URLSearchParams({ message: msg })
+  });
+
+  const data = await res.json();
+
+  hideTyping();
+  appendBot(data.reply);
+});
+
+/* Append USER */
+function appendUser(text){
+  const box = document.getElementById("chat-box");
+  box.insertAdjacentHTML("beforeend", `
+    <div class="msg-row right">
+      <div class="msg-content">
+        <div class="meta">You • now</div>
+        <div class="text">${text}</div>
+      </div>
+      <div class="msg-avatar user">You</div>
+    </div>
+  `);
+  box.scrollTop = box.scrollHeight;
+}
+
+/* Append BOT */
+function appendBot(text){
+  const box = document.getElementById("chat-box");
+  box.insertAdjacentHTML("beforeend", `
+    <div class="msg-row left">
+      <div class="msg-avatar bot">AI</div>
+      <div class="msg-content">
+        <div class="meta">AI • now</div>
+        <div class="text">${text}</div>
+      </div>
+    </div>
+  `);
+  box.scrollTop = box.scrollHeight;
+}
+
+/* Typing animation */
+function showTyping() {
+  const box = document.getElementById("chat-box");
+  box.insertAdjacentHTML("beforeend", `
+    <div id="typing" class="msg-row left">
+      <div class="msg-avatar bot">AI</div>
+      <div class="msg-content">
+        <div class="meta">AI • typing...</div>
+        <div class="text">
+          <span class="typing-dots"><span>•</span><span>•</span><span>•</span></span>
+        </div>
+      </div>
+    </div>
+  `);
+  box.scrollTop = box.scrollHeight;
+}
+
+function hideTyping(){
+  const t = document.getElementById("typing");
+  if (t) t.remove();
+}
+window.showStudentPanel = function(panel) {
+  const box = document.getElementById("suggestions-placeholder");
+
+  if (panel === "assignments") {
+    box.innerHTML = "<b>Assignments</b><br>Coming soon...";
+  }
+  if (panel === "timetable") {
+    box.innerHTML = "<b>Timetable Planner</b><br>Coming soon...";
+  }
+  if (panel === "targets") {
+    box.innerHTML = "<b>Study Targets</b><br>Coming soon...";
+  }
+  if (panel === "diary") {
+    box.innerHTML = "<b>Daily Diary</b><br>Coming soon...";
+  }
+  if (panel === "pomodoro") {
+    box.innerHTML = "<b>Pomodoro Mode</b><br>Coming soon...";
+  }
+};
+window.showStudentPanel = async function(panel) {
+    const box = document.getElementById("side-panel-content");
+    box.innerHTML = "<p style='padding:10px;'>Loading...</p>";
+
+    const res = await fetch(`/fragment/${panel}`);
+    box.innerHTML = await res.text();
+};
+// Load assignment reminders
+
+async function loadReminders() {
+  try {
+    const res = await fetch("/api/assignments/reminders?days=7");
+    const reminders = await res.json();
+
+    const content = document.getElementById("reminderContent");
+
+    // No reminders
+    if (!reminders.length) {
+      content.innerHTML = `
+        <div class="rem-empty">No upcoming tasks 🎉</div>
+      `;
+      return;
+    }
+
+    // Sort: high → medium → low → completed
+    reminders.sort((a,b) => {
+      const order = { high: 1, medium: 2, low: 3 };
+      return (order[a.priority] || 99) - (order[b.priority] || 99);
+    });
+
+    content.innerHTML = reminders.map(r => {
+
+      // 
+      let dueText = "";
+      const today = new Date();
+      const due = new Date(r.due_date);
+      const diff = Math.ceil((due - today) / (1000*60*60*24));
+
+      if (diff < 0) dueText = `<span class="due overdue">Overdue</span>`;
+      else if (diff === 0) dueText = `<span class="due today">Today</span>`;
+      else if (diff === 1) dueText = `<span class="due">Due Tomorrow</span>`;
+      else dueText = `<span class="due">Due in ${diff} days</span>`;
+
+      // Progress bar width
+      const prog = r.progress || 0;
+
+      return `
+  <div class="rem-item" data-id="${r.id}" data-duedate="${r.due_date}">
+
+    <div class="rem-top">
+      <input type="checkbox" class="rem-check" ${r.status === "completed" ? "checked" : ""}>
+      <div class="rem-title ${r.status === "completed" ? "done" : ""}">
+        ${r.title}
+      </div>
+      <button class="rem-delete-btn" data-id="${r.id}">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </div>
+
+    <!-- Circular Progress Ring -->
+    <div class="rem-ring-wrap">
+      <svg class="rem-ring" width="48" height="48">
+        <circle class="ring-bg" cx="24" cy="24" r="20"></circle>
+        <circle class="ring-fg" cx="24" cy="24" r="20"></circle>
+      </svg>
+      <div class="ring-text" id="ring-text-${r.id}">--</div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="rem-countdown" id="count-${r.id}">
+      Loading...
+    </div>
+
+    <!-- Meta -->
+    <div class="rem-meta">
+      <span class="priority-badge priority-${r.priority}">${r.priority}</span>
+    </div>
+
+  </div>
+`;
+
+    }).join("");
+    
+    updateCountdowns();      // ⏳ Run countdowns immediately
+    attachReminderEvents();
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+function attachReminderEvents() {
+
+  // mark done / undone
+  document.querySelectorAll(".rem-check").forEach(chk => {
+    chk.onclick = async () => {
+      const id = chk.closest(".rem-item").dataset.id;
+      const completed = chk.checked;
+
+      await fetch(`/api/assignments/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          status: completed ? "completed" : "not_started",
+          progress: completed ? 100 : 0
+        })
+      });
+
+      loadReminders();
+    };
+  });
+
+  // delete reminder
+  document.querySelectorAll(".rem-delete-btn").forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.dataset.id;
+      await fetch(`/api/assignments/${id}`, { method: "DELETE" });
+      loadReminders();
+    };
+  });
+
+  // expand notes
+  document.querySelectorAll(".rem-notes-toggle").forEach(tgl => {
+    tgl.onclick = () => {
+      tgl.classList.toggle("open");
+      const notes = tgl.nextElementSibling;
+      notes.style.display = notes.style.display === "block" ? "none" : "block";
+    };
+  });
+}
+// Tick countdown live every second
+setInterval(updateCountdowns, 1000);
+
+function updateCountdowns() {
+  document.querySelectorAll(".rem-item").forEach(item => {
+
+    const id = item.dataset.id;
+    const dueDateStr = item.dataset.duedate;
+    const due = new Date(dueDateStr);
+    const now = new Date();
+
+    const ms = due - now;
+    const sec = Math.floor(ms / 1000);
+    const min = Math.floor(sec / 60);
+    const hr  = Math.floor(min / 60);
+    const day = Math.floor(hr / 24);
+
+    let display = "";
+    let remainingPercent = 0;
+
+    if (sec <= 0) {
+      display = "⏳ Overdue";
+      remainingPercent = 100;
+    } else if (day >= 1) {
+      display = `${day}d ${hr % 24}h left`;
+      remainingPercent = 100 - ((ms / (day * 24 * 60 * 60 * 1000)) * 100);
+    } else if (hr >= 1) {
+      display = `${hr}h ${min % 60}m left`;
+      remainingPercent = 100 - ((ms / (24 * 60 * 60 * 1000)) * 100);
+    } else if (min >= 1) {
+      display = `${min}m ${sec % 60}s left`;
+      remainingPercent = 100 - ((ms / (60 * 60 * 1000)) * 100);
+    } else {
+      display = `${sec}s left`;
+      remainingPercent = 100 - ((ms / (60 * 1000)) * 100);
+    }
+
+    // update countdown text
+    const countEl = document.getElementById(`count-${id}`);
+    if (countEl) countEl.innerHTML = display;
+
+    // ring animation
+    const ring = item.querySelector(".ring-fg");
+    const circumference = 125; 
+    const offset = circumference - (circumference * remainingPercent / 100);
+    ring.style.strokeDashoffset = offset;
+
+    // update ring text (percentage)
+    const txt = document.getElementById(`ring-text-${id}`);
+    if (txt) txt.innerHTML = Math.round(remainingPercent) + "%";
+  });
+}
+
+
+// Load reminders on page load
+document.addEventListener("DOMContentLoaded", loadReminders);
+
+</script>
+
+{% endblock %}

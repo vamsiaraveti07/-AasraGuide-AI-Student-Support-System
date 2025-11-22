@@ -1,0 +1,114 @@
+/* ===============================
+   CHATGPT STYLE CHAT UI
+   =============================== */
+
+.chat-column {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 25px 30px;
+}
+
+/* Scrollable messages area */
+.chat-box {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* Message row wrapper */
+.msg-row {
+  width: 100%;
+  display: flex;
+}
+
+/* Bot message aligns left */
+.msg-row.bot {
+  justify-content: flex-start;
+}
+
+/* User message aligns right */
+.msg-row.user {
+  justify-content: flex-end;
+}
+
+/* Bubble style */
+.msg-bubble {
+  max-width: 78%;
+  padding: 16px 18px;
+  border-radius: 12px;
+  line-height: 1.6;
+  font-size: 0.97rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Bot bubble */
+.msg-row.bot .msg-bubble {
+  background: #111a2e;
+  border-left: 3px solid #2ea3ff;
+  color: #e9f2ff;
+}
+
+/* User bubble */
+.msg-row.user .msg-bubble {
+  background: #083a63;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #ffffff;
+}
+
+/* Message header (You • time / Bot • time) */
+.meta {
+  font-size: 12px;
+  opacity: 0.5;
+  margin-bottom: 6px;
+}
+
+/* Empty start screen */
+.empty-state {
+  text-align: center;
+  opacity: 0.6;
+  margin-top: 80px;
+}
+
+/* ===============================
+   INPUT AREA
+   =============================== */
+
+.chat-input {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  max-width: 900px;
+  margin: 0 auto 18px auto;
+  width: 100%;
+}
+
+.chat-input textarea {
+  flex: 1;
+  resize: none;
+  min-height: 42px;
+  max-height: 200px;
+  padding: 14px;
+  background: #0f1a2e;
+  color: #dce3f1;
+  border: 1px solid #1c2947;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.send-btn {
+  background: #0ea56b;
+  border: none;
+  padding: 0 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+}
