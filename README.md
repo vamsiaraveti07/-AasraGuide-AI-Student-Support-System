@@ -24,7 +24,8 @@ AasraGuide includes 5 core modules, each engineered to deliver a premium, reliab
      
      • Auto-save & Instant Update
   
-Impact
+#### Impact
+
 Enables quick concept capturing, fast revisions, and visually enriched study notes.
 
 ## 2. 📘 Assignment Manager
@@ -40,7 +41,8 @@ Enables quick concept capturing, fast revisions, and visually enriched study not
      
      • Clean, responsive UI
   
-Impact
+#### Impact
+
 Prevents missed deadlines and centralizes all academic work.
 
 ## 3. ⏳ Pomodoro Productivity Timer
@@ -55,5 +57,6 @@ A clean, simple focus timer with industry-standard Pomodoro cycles.
      • Start / Pause / Reset
      
      • Live countdown display
-Impact
+#### Impact
+
 Improves focus and productivity with proven time-management methodology.
