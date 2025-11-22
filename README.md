@@ -261,21 +261,33 @@ A specialized AI module designed to simplify exam preparation.
       python app.py
 
 ## 🖼️ Screenshots
-### Register Page
-<img width="1902" height="895" alt="Image" src="https://github.com/user-attachments/assets/174c32df-7955-4b98-bff9-cfe5b79db14a" />
-### Login Page 
-<img width="1915" height="881" alt="image" src="https://github.com/user-attachments/assets/5a937651-1e16-4dda-ae4f-a14ff7a117e4" />
-### Main Dashboard (Chatpage)
-<img width="1919" height="907" alt="Image" src="https://github.com/user-attachments/assets/7db5efee-7016-4be6-8553-08dc8712a108" />
-### Assignment 
-<img width="1910" height="901" alt="Image" src="https://github.com/user-attachments/assets/1fc1c204-25bd-4cf8-a77f-3f190841ec2b" />
-### Notes 
-<img width="1919" height="887" alt="Image" src="https://github.com/user-attachments/assets/34824ed8-ad04-4283-b01f-96acbeb4f815" />
-### Exam Helper
-<img width="1911" height="889" alt="Image" src="https://github.com/user-attachments/assets/555d8e1d-ce17-4938-a5ee-b44b9bb3e13e" />
-### Pomodoro
-<img width="1916" height="893" alt="Image" src="https://github.com/user-attachments/assets/f49cb74a-a40b-4311-842b-4096318b8248" />
+## Register Page
 
+<img width="1902" height="895" alt="Image" src="https://github.com/user-attachments/assets/174c32df-7955-4b98-bff9-cfe5b79db14a" />
+
+## Login Page 
+
+<img width="1919" height="904" alt="Image" src="https://github.com/user-attachments/assets/615ae25a-4b53-4d7c-aafe-bd04b8f007d6" />
+
+## Main Dashboard (Chatpage)
+
+<img width="1919" height="907" alt="Image" src="https://github.com/user-attachments/assets/7db5efee-7016-4be6-8553-08dc8712a108" />
+
+## Assignment 
+
+<img width="1910" height="901" alt="Image" src="https://github.com/user-attachments/assets/1fc1c204-25bd-4cf8-a77f-3f190841ec2b" />
+
+## Notes 
+
+<img width="1919" height="887" alt="Image" src="https://github.com/user-attachments/assets/34824ed8-ad04-4283-b01f-96acbeb4f815" />
+
+## Exam Helper
+
+<img width="1911" height="889" alt="Image" src="https://github.com/user-attachments/assets/555d8e1d-ce17-4938-a5ee-b44b9bb3e13e" />
+
+## Pomodoro
+
+<img width="1916" height="893" alt="Image" src="https://github.com/user-attachments/assets/f49cb74a-a40b-4311-842b-4096318b8248" />
 
 
 ## 🔧 Configuration
