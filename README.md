@@ -12,17 +12,17 @@ AasraGuide includes 5 core modules, each engineered to deliver a premium, reliab
    A powerful, rich-text notes system built for fast academic writing.
  ### Key Capabilities
      
-     • Rich Editor with bold, highlight, formatting
-     
-     • Instant Highlighting using custom marker colors
-     
-     • Image & File Attachments inside notes
-     
-     • Preview in Lightbox (click to zoom images)
-     
-     • Tags Support for organizing subjects
-     
-     • Auto-save & Instant Update
+  • Rich Editor with bold, highlight, formatting
+  
+  • Instant Highlighting using custom marker colors
+  
+  • Image & File Attachments inside notes
+  
+  • Preview in Lightbox (click to zoom images)
+  
+  • Tags Support for organizing subjects
+  
+  • Auto-save & Instant Update
   
 #### Impact
 
@@ -31,15 +31,15 @@ AasraGuide includes 5 core modules, each engineered to deliver a premium, reliab
 ## 2. 📘 Assignment Manager
   A complete workflow for tracking academic tasks.
 ### Features
-     • Add, edit, delete assignments
-     
-     • Subject-wise organization
-     
-     • Due date tracking
-     
-     • Auto reminders for upcoming deadlines
-     
-     • Clean, responsive UI
+  • Add, edit, delete assignments
+  
+  • Subject-wise organization
+  
+  • Due date tracking
+  
+  • Auto reminders for upcoming deadlines
+  
+  • Clean, responsive UI
   
 #### Impact
 
@@ -48,15 +48,15 @@ AasraGuide includes 5 core modules, each engineered to deliver a premium, reliab
 ## 3. ⏳ Pomodoro Productivity Timer
 A clean, simple focus timer with industry-standard Pomodoro cycles.
 ### Features
-     • 25-minute focus sessions
+  • 25-minute focus sessions
+  
+  • 5-minute short breaks
+  
+  • 4-cycle long break logic
+  
+  • Start / Pause / Reset
      
-     • 5-minute short breaks
-     
-     • 4-cycle long break logic
-     
-     • Start / Pause / Reset
-     
-     • Live countdown display
+  • Live countdown display
 #### Impact
 
    Improves focus and productivity with proven time-management methodology.
@@ -66,15 +66,15 @@ A clean, simple focus timer with industry-standard Pomodoro cycles.
 A specialized AI module designed to simplify exam preparation. 
 ### Features
 
-      • Instant subject guide generation
-      
-      • Summaries, important points, key formulas
-      
-      • Clean structured output
-      
-      • History tracking
-      
-      • One-click re-view
+   • Instant subject guide generation
+   
+   • Summaries, important points, key formulas
+   
+   • Clean structured output
+   
+   • History tracking
+   
+   • One-click re-view
 
 #### Impact
 
@@ -85,110 +85,120 @@ A specialized AI module designed to simplify exam preparation.
 
 ### Features
 
-      • Intelligent responses
-      
-      • Study guidance
-      
-      • Explains concepts
-      
-      • Supports multi-topic conversations
+   • Intelligent responses
+   
+   • Study guidance
+   
+   • Explains concepts
+   
+   • Supports multi-topic conversations
 
 #### Impact
 
    Acts as a virtual tutor available anytime.
 
 ## 📂 System Architecture
-      AasraGuide AI
-      │
-      ├── __pycache__/                         // Python cache
-      │
-      ├── instance/
-      │
-      ├── static/
-      │     ├── icons/
-      │     │     ├── Assignment.png
-      │     │     ├── bot.png
-      │     │     ├── Exam.png
-      │     │     ├── notes.png
-      │     │     ├── pomo.png
-      │     │     ├── pomo.svg
-      │     │     ├── send.png
-      │     │     └── user.png
-      │     │
-      │     ├── images/
-      │     │
-      │     ├── uploads/
-      │     │     └── notes/                  // Uploaded note files
-      │     │
-      │     ├── chat.css
-      │     ├── sidebar.css
-      │     ├── style.css
-      │     │
-      │     ├── chatgpt.js
-      │     ├── exam_helper.js
-      │     ├── feature_assignments.js
-      │     ├── notes.js
-      │     ├── pomodoro.js
-      │     └── sidebar.js
-      │
-      ├── templates/
-      │     ├── fragments/
-      │     │     ├── assignments.html
-      │     │     ├── exam_helper.html
-      │     │     ├── notes.html
-      │     │     └── pomodoro.html
-      │     │
-      │     ├── base.html
-      │     ├── chat.html
-      │     ├── exam_test_standalone.html
-      │     ├── login.html
-      │     └── register.html
-      │
-      ├── venv/
-      │
-      ├── ai_engine.py
-      ├── app.py
-      ├── config.py
-      ├── db.py
-      ├── models.py
-      ├── utils_emotion.py
-      └── requirements.txt
+   AasraGuide AI
+   │
+   ├── __pycache__/                         // Python cache
+   │
+   ├── instance/
+   │
+   ├── static/
+   │     ├── icons/
+   │     │     ├── Assignment.png
+   │     │     ├── bot.png
+   │     │     ├── Exam.png
+   │     │     ├── notes.png
+   │     │     ├── pomo.png
+   │     │     ├── pomo.svg
+   │     │     ├── send.png
+   │     │     └── user.png
+   │     │
+   │     ├── images/
+   │     │
+   │     ├── uploads/
+   │     │     └── notes/                  // Uploaded note files
+   │     │
+   │     ├── chat.css
+   │     ├── sidebar.css
+   │     ├── style.css
+   │     │
+   │     ├── chatgpt.js
+   │     ├── exam_helper.js
+   │     ├── feature_assignments.js
+   │     ├── notes.js
+   │     ├── pomodoro.js
+   │     └── sidebar.js
+   │
+   ├── templates/
+   │     ├── fragments/
+   │     │     ├── assignments.html
+   │     │     ├── exam_helper.html
+   │     │     ├── notes.html
+   │     │     └── pomodoro.html
+   │     │
+   │     ├── base.html
+   │     ├── chat.html
+   │     ├── exam_test_standalone.html
+   │     ├── login.html
+   │     └── register.html
+   │
+   ├── venv/
+   │
+   ├── ai_engine.py
+   ├── app.py
+   ├── config.py
+   ├── db.py
+   ├── models.py
+   ├── utils_emotion.py
+   └── requirements.txt
 ## 🗄️ Database Schema
    ### Users
-      id          INT PK
-      username    TEXT
-      password    TEXT (hashed)
+   
+   id          INT PK
+   username    TEXT
+   password    TEXT (hashed)
+   
    ### Notes
-      id              INT PK
-      user_id         FK -> users.id
-      title           TEXT
-      content         TEXT
-      tags            TEXT
-      attachments     TEXT (JSON)
-      created_at      DATETIME
+
+   id              INT PK
+   user_id         FK -> users.id
+   title           TEXT
+   content         TEXT
+   tags            TEXT
+   attachments     TEXT (JSON)
+   created_at      DATETIME
+   
    ### Assignments
-      id              INT PK
-      user_id         FK -> users.id
-      title           TEXT
-      subject         TEXT
-      due_date        DATETIME
-      notes           TEXT
+   
+   id              INT PK
+   user_id         FK -> users.id
+   title           TEXT
+   subject         TEXT
+   due_date        DATETIME
+   notes           TEXT
+   
    ### Exam Helper History
-      id              INT PK
-      user_id         FK -> users.id
-      topic           TEXT
-      content         TEXT
-      created_at      DATETIME
+   
+   id              INT PK
+   user_id         FK -> users.id
+   topic           TEXT
+   content         TEXT
+   created_at      DATETIME
+   
 ## 🛠️ Installation & Setup
+
  ### Prerequisites
 
-     • Python 3.8+
-      
-     • Flask
-      
-     • SQLite
-      
-     • Internet connection for AI responses
+  • Python 3.8+
+   
+  • Flask
+   
+  • SQLite
+   
+  • Internet connection for AI responses
+  
 ## 1. Clone Repository
       git clone <repository-url>
       cd AasraGuide
@@ -214,13 +224,15 @@ A specialized AI module designed to simplify exam preparation.
 
 ## 🐛 Troubleshooting
 ### Notes not saving?
+
    ✔ Check initQuickNotes() is running
    
    ✔ Verify /fragment/notes loaded
    
    ✔ Check console for JS errors
 
-####Pomodoro not starting?
+#### Pomodoro not starting?
+
    ✔ Ensure pomodoro.js is loading
    
    ✔ Check console for missing file path
@@ -250,8 +262,29 @@ A specialized AI module designed to simplify exam preparation.
    Pull requests and feature suggestions are welcome.
 
 ## 📄 License
-   This project is licensed under the MIT License.
+ This project is licensed under the MIT License.
+ 
+## 🧾 Version Information
+     
+| Component                    Version         |
+| ---------------------- | ------------------- |
+| AasraGuide System      | v1.0.0              |
+| Backend (Flask)        | 2.x                 |
+| Frontend (HTML/CSS/JS) | Stable              |
+| Database               | SQLite 3            |
+| Python                 | 3.8+                |
+| AI Integration         | OpenAI API Ready    |
+| Last Updated           | Nov 2025            |
+| Status                 | Active & Stable     |
+
+## 📞 Enquiry & Support
+   Need help, facing issues, or want new features?
+   We’re here for you! 👇
+ ### 📧 Email Support
+      vamsiaraveti4444@gmail.com
+
 ## 🎉 Final Note
+
    AasraGuide is built to give students a powerful, all-in-one academic support system that feels modern, intuitive, and intelligent — a companion for       every student.
 
 
