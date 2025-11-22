@@ -99,6 +99,7 @@ A specialized AI module designed to simplify exam preparation.
 
 ## 📂 System Architecture
    AasraGuide AI
+   
    │
    
    ├── __pycache__/                         // Python cache
@@ -108,54 +109,98 @@ A specialized AI module designed to simplify exam preparation.
    │
    
    ├── static/
+   
    │     ├── icons/
+   
    │     │     ├── Assignment.png
+   
    │     │     ├── bot.png
+   
    │     │     ├── Exam.png
+   
    │     │     ├── notes.png
+   
    │     │     ├── pomo.png
+   
    │     │     ├── pomo.svg
+   
    │     │     ├── send.png
+   
    │     │     └── user.png
+   
    │     │
+   
    │     ├── images/
+   
    │     │
+   
    │     ├── uploads/
-   │     │     └── notes/                  // Uploaded note files
+   
+   │     │     └── notes/ 
+   
+   // Uploaded note files
+   
    │     │
+   
    │     ├── chat.css
+   
    │     ├── sidebar.css
+   
    │     ├── style.css
+   
    │     │
+   
    │     ├── chatgpt.js
+   
    │     ├── exam_helper.js
+   
    │     ├── feature_assignments.js
+   
    │     ├── notes.js
+   
    │     ├── pomodoro.js
+   
    │     └── sidebar.js
    │
+   
    ├── templates/
+   
    │     ├── fragments/
+   
    │     │     ├── assignments.html
+   
    │     │     ├── exam_helper.html
+   
    │     │     ├── notes.html
+   
    │     │     └── pomodoro.html
+   
    │     │
    │     ├── base.html
+   
    │     ├── chat.html
-   │     ├── exam_test_standalone.html
+   
    │     ├── login.html
+   
    │     └── register.html
    │
+   
    ├── venv/
    │
    ├── ai_engine.py
+   
    ├── app.py
+   
    ├── config.py
+   
    ├── db.py
+   
    ├── models.py
+   
    ├── utils_emotion.py
+   
    └── requirements.txt
+   
 ## 🗄️ Database Schema
    ### Users
    
